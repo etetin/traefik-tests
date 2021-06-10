@@ -19,6 +19,10 @@ services:
       - --certificatesresolvers.letsencrypt.acme.email=${EMAIL?Variable not set}
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=http
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.http-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.http-to-https.redirectscheme.permanent=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./volumes/letsencrypt:/letsencrypt
@@ -29,6 +33,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.service1-http.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/`)
       - traefik.http.routers.service1-http.entrypoints=http
+      - traefik.http.routers.service1-http.middlewares=http-to-https
       - traefik.http.routers.service1-https.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/`)
       - traefik.http.routers.service1-https.entrypoints=https
       - traefik.http.routers.service1-https.tls=true
