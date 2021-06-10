@@ -1,0 +1,47 @@
+version: "3.3"
+
+services:
+  proxy:
+    image: traefik:v2.4
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    env_file:
+      - .env
+    command:
+      - --providers.docker
+      - --providers.docker.exposedByDefault=false
+      - --log
+      - --api.insecure
+      - --entryPoints.http.address=:80
+      - --entryPoints.https.address=:443
+      - --certificatesresolvers.letsencrypt.acme.email=${EMAIL?Variable not set}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=http
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./volumes/letsencrypt:/letsencrypt
+
+  service1:
+    image: etetin/fastami:latest
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.service1-http.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/`)
+      - traefik.http.routers.service1-http.entrypoints=http
+      - traefik.http.routers.service1-https.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/`)
+      - traefik.http.routers.service1-https.entrypoints=https
+      - traefik.http.routers.service1-https.tls=true
+      - traefik.http.routers.service1-https.tls.certresolver=letsencrypt
+
+  service2:
+    image: etetin/fastami:latest
+    expose:
+      - 82
+    environment:
+      - PORT=82
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.service2-http.rule=Host(`ddd.${DOMAIN?Variable not set}`) && PathPrefix(`/`)
+      - traefik.http.routers.service2-http.entrypoints=http
+      - traefik.http.services.someshit.loadbalancer.server.port=82
