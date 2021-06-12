@@ -13,6 +13,7 @@ services:
       - --providers.docker
       - --providers.docker.exposedByDefault=false
       - --log
+      - --accesslog
       - --api.insecure
       - --entryPoints.http.address=:80
       - --entryPoints.https.address=:443
