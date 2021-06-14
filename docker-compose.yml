@@ -16,14 +16,15 @@ services:
       - --accesslog
       - --api.insecure=false
       - --entryPoints.http.address=:80
+      - --entryPoints.http.http.redirections.entryPoint.to=https
+      - --entryPoints.http.http.redirections.entryPoint.scheme=https
       - --entryPoints.https.address=:443
+      - --entryPoints.https.http.tls.certResolver=letsencrypt
       - --certificatesresolvers.letsencrypt.acme.email=${EMAIL?Variable not set}
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=http
     labels:
       - traefik.enable=true
-      - traefik.http.middlewares.http-to-https.redirectscheme.scheme=https
-      - traefik.http.middlewares.http-to-https.redirectscheme.permanent=true
       - traefik.http.middlewares.base-auth.basicauth.users=test:$$2y$$05$$UpXgjgU2w4NR8eQSiYZEZ.RWuN4qJEkLY1YoyqymSNaLPC.h9kkWe  # passwd - test
       - traefik.http.routers.dashboard.rule=Host(`monitor.${DOMAIN?Variable not set}`)
       - traefik.http.routers.dashboard.service=api@internal
@@ -38,7 +39,6 @@ services:
       - traefik.enable=true
       - traefik.http.routers.service1-http.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/`)
       - traefik.http.routers.service1-http.entrypoints=http
-      - traefik.http.routers.service1-http.middlewares=http-to-https
       - traefik.http.routers.service1-https.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/`)
       - traefik.http.routers.service1-https.entrypoints=https
       - traefik.http.routers.service1-https.tls=true
