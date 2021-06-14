@@ -27,6 +27,7 @@ services:
       - traefik.enable=true
       - traefik.http.middlewares.base-auth.basicauth.users=test:$$2y$$05$$UpXgjgU2w4NR8eQSiYZEZ.RWuN4qJEkLY1YoyqymSNaLPC.h9kkWe  # passwd - test
       - traefik.http.routers.dashboard.rule=Host(`monitor.${DOMAIN?Variable not set}`)
+      - traefik.http.routers.dashboard.entrypoints=https
       - traefik.http.routers.dashboard.service=api@internal
       - traefik.http.routers.dashboard.middlewares=base-auth
     volumes:
@@ -38,6 +39,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.service1-http.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/`)
+      - traefik.http.routers.service1-http.entrypoints=https
 
   service2:
     image: etetin/fastami:latest
@@ -48,4 +50,5 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.service2-http.rule=Host(`ddd.${DOMAIN?Variable not set}`) && PathPrefix(`/`)
-      - traefik.http.services.someshit.loadbalancer.server.port=82
+      - traefik.http.routers.service2-http.entrypoints=https
+      - traefik.http.services.service2.loadbalancer.server.port=82
