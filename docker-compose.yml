@@ -14,7 +14,7 @@ services:
       - --providers.docker.exposedByDefault=false
       - --log
       - --accesslog
-      - --api.insecure
+      - --api.insecure=false
       - --entryPoints.http.address=:80
       - --entryPoints.https.address=:443
       - --certificatesresolvers.letsencrypt.acme.email=${EMAIL?Variable not set}
@@ -24,6 +24,10 @@ services:
       - traefik.enable=true
       - traefik.http.middlewares.http-to-https.redirectscheme.scheme=https
       - traefik.http.middlewares.http-to-https.redirectscheme.permanent=true
+      - traefik.http.middlewares.base-auth.basicauth.users=test:$$2y$$05$$UpXgjgU2w4NR8eQSiYZEZ.RWuN4qJEkLY1YoyqymSNaLPC.h9kkWe  # passwd - test
+      - traefik.http.routers.dashboard.rule=Host(`monitor.${DOMAIN?Variable not set}`)
+      - traefik.http.routers.dashboard.service=api@internal
+      - traefik.http.routers.dashboard.middlewares=base-auth
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./volumes/letsencrypt:/letsencrypt
