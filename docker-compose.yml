@@ -38,11 +38,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.service1-http.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/`)
-      - traefik.http.routers.service1-http.entrypoints=http
-      - traefik.http.routers.service1-https.rule=Host(`${DOMAIN?Variable not set}`) && PathPrefix(`/`)
-      - traefik.http.routers.service1-https.entrypoints=https
-      - traefik.http.routers.service1-https.tls=true
-      - traefik.http.routers.service1-https.tls.certresolver=letsencrypt
 
   service2:
     image: etetin/fastami:latest
@@ -53,5 +48,4 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.service2-http.rule=Host(`ddd.${DOMAIN?Variable not set}`) && PathPrefix(`/`)
-      - traefik.http.routers.service2-http.entrypoints=http
       - traefik.http.services.someshit.loadbalancer.server.port=82
